@@ -7,10 +7,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtilBase
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.idea.caches.resolve.resolveToCall
 import org.jetbrains.kotlin.idea.structuralsearch.visitor.KotlinRecursiveElementVisitor
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.resolve.source.getPsi
 
 /**
  * Algorithm:
@@ -56,11 +60,39 @@ class CreatePageObjectAction : CodeInsightAction(), CodeInsightActionHandler {
 
                     println("CREATE --> Visitor --> visitCallExpression | expression.text: ${expression.text.take(40)}")
 
-                    expression.acceptChildren(this)
+                    val functionDescriptor = expression.resolveToCall()?.resultingDescriptor as? FunctionDescriptor
+                    val namedFunction = functionDescriptor?.source?.getPsi() as? KtNamedFunction
+
+                    if (namedFunction != null && functionDescriptor.isValid()) {
+                        namedFunction.acceptChildren(this)
+                    } else {
+                        expression.acceptChildren(this)
+                    }
                 }
 
             }
         )
     }
+
+    private fun FunctionDescriptor.hasComposableAnnotation(): Boolean {
+        return annotations.hasAnnotation(
+            FqName("androidx.compose.runtime.Composable")
+        )
+    }
+
+    private fun FunctionDescriptor.hasModifierParameter(): Boolean {
+        return valueParameters.any { parameterDescriptor ->
+            parameterDescriptor.type.toString().contains("Modifier")
+        }
+    }
+
+    private fun FunctionDescriptor.isValid(): Boolean {
+        return when {
+            this.hasComposableAnnotation().not() -> false
+            this.hasModifierParameter().not() -> false
+            else -> true
+        }
+    }
+
 
 }

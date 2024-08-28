@@ -1,18 +1,9 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.pstrelchenko.podlodkacrew2024plugintalk</id>
-    <name>podlodka-crew-2024-plugin-talk</name>
+    <name>Podlodka-Crew-2024-Talk</name>
     <vendor>pstrelchenko</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
-
-    <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.pstrelchenko.podlodkacrew2024plugintalk.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-    </extensions>
-
-    <applicationListeners>
-        <listener class="com.github.pstrelchenko.podlodkacrew2024plugintalk.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
 </idea-plugin>

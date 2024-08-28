@@ -7,6 +7,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtilBase
+import org.jetbrains.kotlin.idea.structuralsearch.visitor.KotlinRecursiveElementVisitor
+import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
@@ -35,8 +37,30 @@ class CreatePageObjectAction : CodeInsightAction(), CodeInsightActionHandler {
     }
 
     override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
-        // TODO
-    }
+        val psiElement = PsiUtilBase.getElementAtCaret(editor) ?: return
+        val composableFunction = PsiTreeUtil.getParentOfType(psiElement, KtNamedFunction::class.java) ?: return
 
+        composableFunction.acceptChildren(
+            object : KotlinRecursiveElementVisitor() {
+
+                override fun visitNamedFunction(function: KtNamedFunction) {
+                    super.visitNamedFunction(function)
+
+                    println("CREATE --> Visitor --> visitNamedFunction | function.name: ${function.name}")
+
+                    function.acceptChildren(this)
+                }
+
+                override fun visitCallExpression(expression: KtCallExpression) {
+                    super.visitCallExpression(expression)
+
+                    println("CREATE --> Visitor --> visitCallExpression | expression.text: ${expression.text.take(40)}")
+
+                    expression.acceptChildren(this)
+                }
+
+            }
+        )
+    }
 
 }

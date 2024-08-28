@@ -8,8 +8,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtilBase
+import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtPsiFactory
 
 /**
  * Algorithm:
@@ -54,6 +56,15 @@ class CreatePageObjectAction : CodeInsightAction(), CodeInsightActionHandler {
         """.trimIndent()
 
         println("Text page object: ${pageObjectText}")
+
+        // PsiFactory
+
+        val ktPsiFactory = KtPsiFactory(project)
+        val newFile = ktPsiFactory.createFile(fileName = "MyPageObject.kt", pageObjectText)
+
+        project.executeWriteCommand("Add New Page Object") {
+            psiFile.containingDirectory.add(newFile)
+        }
     }
 
 }

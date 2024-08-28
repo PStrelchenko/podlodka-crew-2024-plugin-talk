@@ -7,4 +7,12 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.kotlin</depends>
 
+    <actions>
+        <action id="CreatePageObjectAction"
+                class="com.github.pstrelchenko.podlodkacrew2024plugintalk.actions.CreatePageObjectAction"
+                text="Create Page Object">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
+    </actions>
+
 </idea-plugin>

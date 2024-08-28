@@ -41,11 +41,19 @@ class CreatePageObjectAction : CodeInsightAction(), CodeInsightActionHandler {
 
         val collectedItems = ComposableFunctionsCollector().collectComposableFunctions(composableFunction)
 
-        collectedItems
-            .forEachIndexed { index, item ->
-                println("========= $index ===========")
-                println(item)
+        val propertiesDeclarations = collectedItems.joinToString(separator = "\n") {
+            "private val ${it.lastAddedTestTagPart} = com.kakao.compose.nodes.KNode { hasTestTag(${it.testTag})"
+        }
+
+        val pageObjectText = """
+            class MyPageObject : ru.hh.shared.core.tests.PageObject<MyPageObject>() {
+            
+               ${propertiesDeclarations}
+    
             }
+        """.trimIndent()
+
+        println("Text page object: ${pageObjectText}")
     }
 
 }
